@@ -1,0 +1,24 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A</title>
+</head>
+<body>
+<textarea id="message">这是高层的密码！</textarea><br/>
+<button id="test">看看员工在说什么</button><br/><br/><br/>员工们：<br/>
+<iframe src="http://www.miitbeian.gov.cn/publish/query/indexFirst.action" width="500" height="300" id="iframe"></iframe>
+<script>
+    var iframe = document.getElementById("iframe")
+    document.getElementById("test").onclick = function(){
+        var url = iframe.src,
+        time = (new Date()).getTime();
+        if(url.indexOf("message") != -1){
+           iframe.src = url.replace(/message=\w+/,"message="+time);
+        }else {
+            iframe.src = url+"/#message="+time;
+        }
+        console.log(iframe.src)
+    }
+</script>
+</body>
+</html>

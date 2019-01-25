@@ -1,0 +1,6 @@
+1.aizhanHTML对不同页面的解析:
+	1.带网站负责人的(5858.com)-aizhan_01.html
+	2.正常的页面(58.com)-aizhang_02.html
+	3.未备案的域名-aizhang_03.html
+	4.少字段的页面-aizhang_04.html
+	

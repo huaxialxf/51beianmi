@@ -1,0 +1,19 @@
+Table: cha_icp_beian_domain_info
+--------------------+--------------+------+-----+---------+---------
+ Field              | Type         | Null | Key | Default | Remarks 
+--------------------+--------------+------+-----+---------+---------
+ id                 | INT(10)      | NO   | PRI |         |         
+ domain_name        | VARCHAR(100) | YES  |     |         | 域名      
+ beian_no           | VARCHAR(100) | YES  |     |         | 备案号     
+ beian_company      | VARCHAR(100) | YES  |     |         | 备案机构    
+ beian_company_type | VARCHAR(100) | YES  |     |         | 备案类型    
+ beian_site_name    | VARCHAR(100) | YES  |     |         | 备案网站    
+ beian_site_url     | VARCHAR(100) | YES  |     |         | 备案网址    
+ beian_time         | VARCHAR(100) | YES  |     |         | 备案时间    
+ sprider_date       | DATETIME(19) | YES  |     |         | 采集日期    
+ source_type        | VARCHAR(4)   | YES  |     |         | 来源类型|01-爱站Single;02-爱站List;03-爱站历史
+ beian_type         | VARCHAR(4)   | YES  |     |         | 备案类型|01-已备案;02-未备案
+ state_type         | VARCHAR(4)   | YES  |     |         | 状态类型|01-未采集;02-采集中;03-采集完毕;04-采集失败
+ create_time        | DATETIME(19) | YES  |     |         | 创建日期    
+--------------------+--------------+------+-----+---------+---------
+

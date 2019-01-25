@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>域名备案查询_icp备案查询_网站备案查询</title>
+<link rel="icon" href="images/avicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="images/avicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="js/icp.js"></script>
+</head>
+<body>
+	<div class="icp-wrap">
+		<div class="main-search">
+			<div class="search-tit-bg">
+				<i class="ico-tit-icp"></i>
+			</div>
+			<h2>ICP备案查询</h2>
+			<div class="search-wrap">
+				<form method="get" class="search-form"
+					onsubmit="return search_form();">
+					<input type="text" class="search-text" id="domain"
+						placeholder="请输入您要查询的网站" autocomplete="off" value="#(domain)" />
+					<input type="submit" class="search-button" value="查询" /> <i
+						class="ico-search-arrow"></i>
+				</form>
+
+				#if(domain) 
+				<div class="search-cache clearfix">
+					#if(info.cacheTime) 缓存于: #(info.cacheTime) #end 
+					<a href="javascript:void(0);"
+						class="confirm-dialog" title="刷新"><i class='ico-refresh'></i></a>
+				</div>
+				#end 
+
+
+				<div class="search-history">
+					<ul></ul>
+				</div>
+			</div>
+		</div>
+		<div class="icp-main">
+			<div class="icp-infos box" id="icp-html">
+				<div class="title">
+					<i class="ico-bar-vertical"></i>
+					<h4>备案信息</h4>
+				</div>
+				<div id="icp-table" #if(!(info.domain || domain==null) ) style="display: none" #end >
+					<table class="table">
+						<tr>
+							<td class="thead">主办单位名称</td>
+							<td>#(info.commanyName)</td>
+						</tr>
+						<tr>
+							<td class="thead">主办单位性质</td>
+							<td>#(info.commanyType)</td>
+						</tr>
+						<tr>
+							<td class="thead">网站备案/许可证号</td>
+							<td><span>#(info.beiAnNo)</span></td>
+						</tr>
+						<tr>
+							<td class="thead">网站名称</td>
+							<td>#(info.siteName)</td>
+						</tr>
+						<tr>
+							<td class="thead">网站首页网址</td>
+							<td>#(info.siteUrl)</td>
+						</tr>
+						<tr>
+							<td class="thead">网站域名</td>
+							<td> #(info.domain)
+							</td>
+						</tr>
+						<tr>
+							<td class="thead">审核时间</td>
+							<td><span>#(info.shenHeTime)</span></td>
+						</tr>
+					</table>
+				</div>
+				<div id="icp-table-no"  #if(info.domain || domain==null ) style="display: none" #end >
+					<table class="table">
+						<tr>
+							<td class="thead">网站备案/许可证号</td>
+							<td><span>域名未备案</span></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+
+<div id="confirm-modal" class="modal" style="display: none">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form action="" onsubmit="return verify()">
+				<div class="modal-header">
+					<a href="javascript:void(0);" class="close"><span>×</span></a>
+					<h4 class="modal-title">刷新缓存</h4>
+				</div>
+				<div class="modal-body">
+					<div>
+						<img id="captcha" class="captcha" src="" width="150" height="45"
+							style="cursor: pointer; background-color: #f0f0f0" title="换一张"
+							alt="换一张" />
+					</div>
+					<div>
+						<label>验证码：</label><input type="text" name="code" id="code"
+							size="6" maxlength="6"
+							style="width: 82px; height: 30px; line-height: 30px;" />
+					</div>
+					<div>
+						<p>请输入图片中的验证码</p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="no default-button">取消</button>
+					<button type="submit" class="yes blue-button" id="verifyCode">确定</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="mask"></div>
+</div>

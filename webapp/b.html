@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JSONP方式</title>
+</head>
+<body>
+<textarea id="message">这是员工的密码！</textarea><br/>
+<button id="test">看看领导在说什么</button><br/>
+<script>
+var data = {};
+var hash_url;
+function dealHash(){
+    hash_url = window.location.hash;
+    console.log(hash_url)
+     var  datas = hash_url.split("#")[1].split("&");
+    for(var i = 0;i<datas.length;i++){
+        var t = datas[i].split("=");
+        data[t[0]] = decodeURIComponent(t[1]);
+    }
+}
+function change(){
+	console.log(hash_url+"-->"+window.location.hash)
+    if(hash_url!=window.location.hash){
+        dealHash();
+        document.getElementById("message").value = data["message"];
+    }
+}
+setInterval(change,100);
+</script>
+</body>
+</html>
