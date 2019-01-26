@@ -5,12 +5,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
@@ -31,6 +31,7 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.marksmile.icp.tools.authcode.AuthCodeUtil;
+import com.marksmile.icp.tools.db.model.BeianDomainInfo;
 import com.marksmile.icp.tools.entry.IcpInfoMiitBeian;
 import com.marksmile.icp.tools.htmlunit.MyWebConnection;
 import com.marksmile.utils.DateUtil;
@@ -41,7 +42,16 @@ import com.marksmile.utils.JSONUtil;
 public class MiitbeianService {
 	private static Logger logger = LoggerFactory.getLogger(MiitbeianService.class);
 
-	public MiitbeianService() {
+	private static MiitbeianService one = new MiitbeianService();
+
+	public static MiitbeianService one() {
+		if (one == null) {
+			one = new MiitbeianService();
+		}
+		return one;
+	}
+
+	private MiitbeianService() {
 	}
 
 	public String getCookie() throws Exception {
@@ -70,7 +80,7 @@ public class MiitbeianService {
 			builder.append(cookie.getName() + "=" + cookie.getValue() + "; ");
 		}
 
-		logger.info("cookie:" + builder.toString());
+		logger.debug("cookie:" + builder.toString());
 		client.close();
 		return builder.toString();
 	}
@@ -106,11 +116,7 @@ public class MiitbeianService {
 	public String getAuthCode(byte[] image) throws Exception {
 		String code = null;
 		code = AuthCodeUtil.getCode(ImageIO.read(new ByteArrayInputStream(image)));
-		if (code != null) {
-			logger.info("code == {}", code);
-		} else {
-			logger.info("code == null");
-		}
+		logger.info("code == {}", code);
 		return code;
 	}
 
@@ -190,7 +196,8 @@ public class MiitbeianService {
 		param.put("mainUnitCertNo", "");
 		param.put("verifyCode", code.toLowerCase());
 		String ret = clientKit.exePostMethodForString(
-				"http://www.miitbeian.gov.cn/icp/publish/query/icpMemoInfo_searchExecute.action", headers, param,"GBK");
+				"http://www.miitbeian.gov.cn/icp/publish/query/icpMemoInfo_searchExecute.action", headers, param,
+				"GBK");
 		return ret;
 	}
 
@@ -233,7 +240,6 @@ public class MiitbeianService {
 			info.setSiteUrl(tds.get(5).text());
 		} else {
 			errNum++;
-			logger.info("err-正确:" + (successNum) + "    错误:" + (errNum));
 			throw new RuntimeException("无法解析的内容");
 		}
 
@@ -301,7 +307,7 @@ public class MiitbeianService {
 			try {
 				isCheck = checkAuthCode(cookie, code);
 				sleep(1000);
-				logger.info("checkAuthCode : " + isCheck);
+				logger.debug("checkAuthCode : " + isCheck);
 				n++;
 				if (isCheck) {
 					break;
@@ -316,13 +322,13 @@ public class MiitbeianService {
 		}
 
 		try {
-			// String html = getHtml(domain, cookie, code);
-			String html = getHtmlByBeiNo("京ICP备04000001号", cookie, code);
-
+			String html = getHtml(domain, cookie, code);
+			// String html = getHtmlByBeiNo("京ICP备04000001号", cookie, code);
+			List<BeianDomainInfo> list = AiZhanPageParser.parseMiit(domain, html);
+			AiZhanPageParser.saveToDb(list);
 			FileOutputStream fos = new FileOutputStream(new File("miitbeian.html"));
 			fos.write(html.getBytes());
 			fos.close();
-			parseHtml(html);
 		} catch (Exception e) {
 			logger.info("checkAuthCode 失败");
 			throw e;
@@ -331,11 +337,12 @@ public class MiitbeianService {
 	}
 
 	public static String getDomain() {
-		String[] domains = new String[] { "yumi.com", "baidu.com", "marksmile.com", "58.com" };
-		int index = new Random().nextInt(4);
-		String domain = domains[index];
-		// return domain;
-		return "yumixxxx.com";
+		BeianDomainInfo info = AiZhanICPService.getAUnSriderDomain();
+		if (info != null) {
+			String domain = info.getDomainName();
+			return domain;
+		}
+		return null;
 	}
 
 	public void start(String name) {
@@ -344,9 +351,15 @@ public class MiitbeianService {
 				while (true) {
 					try {
 						long start = System.currentTimeMillis();
+						String domain = getDomain();
+						if (domain == null) {
+							logger.info("没有域名...");
+							Thread.sleep(1000 * 5);
+							continue;
+						}
+						logger.info("domainName:{}", domain);
 						runTask(getDomain(), null);
 						Thread.sleep(Math.max(1, start + 1000 - System.currentTimeMillis()));
-						// checkCookie();
 					} catch (Exception e) {
 						if ("noimage".equals(e.getMessage())) {
 							logger.info("noimage");
@@ -386,10 +399,10 @@ public class MiitbeianService {
 	}
 
 	public static void main33(String[] args) throws UnsupportedEncodingException {
-		String s= "%E4%BA%ACICP%E5%A4%8704000001%E5%8F%B7";//utf-8
-		String ss ="京ICP备04000001号";
-//		String s= "%BE%A9ICP%B1%B804000001%BA%C5";
-		System.out.println(UrlEncoded.encodeString(new String(ss.getBytes("UTF-8"),"GBK")));
+		String s = "%E4%BA%ACICP%E5%A4%8704000001%E5%8F%B7";// utf-8
+		String ss = "京ICP备04000001号";
+		// String s= "%BE%A9ICP%B1%B804000001%BA%C5";
+		System.out.println(UrlEncoded.encodeString(new String(ss.getBytes("UTF-8"), "GBK")));
 		System.out.println(UrlEncoded.encodeString(ss));
 		System.out.println(UrlEncoded.encodeString(ss, Charset.forName("GBK")));
 	}

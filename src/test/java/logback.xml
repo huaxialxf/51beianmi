@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="GBK"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
 	<contextName>valuation</contextName>
 	<!--statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/ -->
@@ -26,7 +26,7 @@
 				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 					<level>DEBUG</level>
 				</filter>
-				<!-- 固定大小循环滚动日志 -->
+				<!-- 鍥哄畾澶у皬寰幆婊氬姩鏃ュ織 -->
 
 				<rollingPolicy
 					class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -36,10 +36,10 @@
 				</rollingPolicy>
 				<triggeringPolicy
 					class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-					<maxFileSize>20MB</maxFileSize>
+					<maxFileSize>50MB</maxFileSize>
 				</triggeringPolicy>
 
-				<!-- 按照每天进行日志滚动 -->
+				<!-- 鎸夌収姣忓ぉ杩涜鏃ュ織婊氬姩 -->
 
 				<!-- <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> 
 					<fileNamePattern>../logs/task_all.%d{yyyy-MM-dd}-%i.log </fileNamePattern> 
@@ -58,7 +58,7 @@
 	<appender name="FILE_ERROR" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
 			<Key>module</Key>
-			<DefaultValue>domain_monitor</DefaultValue>
+			<DefaultValue>cha_ipc</DefaultValue>
 		</discriminator>
 		<sift>
 			<appender name="FILE_ERROR_${module}"
@@ -80,7 +80,6 @@
 				</triggeringPolicy>
 				<encoder>
 					<pattern>%date{ISO8601} %-4relative [%thread] %.-1level [%-20logger{20}] - %msg%n</pattern>
-					
 					<charset>UTF-8</charset>
 				</encoder>
 			</appender>

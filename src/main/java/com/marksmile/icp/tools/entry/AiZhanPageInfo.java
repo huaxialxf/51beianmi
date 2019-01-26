@@ -103,7 +103,7 @@ public class AiZhanPageInfo {
 			boolean checked = false;
 			if (div != null) {
 				String msg = div.get(0).text();
-				if (msg.indexOf("未找到") > -1) {
+				if (msg.indexOf("未找到") > -1 || msg.indexOf("未备案") > -1) {
 					checked = true;
 				}
 			}

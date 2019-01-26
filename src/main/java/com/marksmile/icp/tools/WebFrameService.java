@@ -9,6 +9,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.marksmile.icp.tools.db.model._MappingKit;
 import com.marksmile.icp.tools.services.AiZhanICPService;
+import com.marksmile.icp.tools.services.MiitbeianService;
 
 /**
  * Hello world!
@@ -40,7 +41,8 @@ public class WebFrameService {
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(dataSource);
 		_MappingKit.mapping(arp);
 		arp.start();
-		AiZhanICPService.one().start();
+		 AiZhanICPService.one().start();
+		MiitbeianService.one().start("miit");
 		JFinal.main(new String[] { "webapp", String.valueOf(808), "/", "-1" });
 	}
 

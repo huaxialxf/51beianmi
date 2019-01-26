@@ -20,7 +20,7 @@
 					if ($(this).val().length == 6) {
 						$.ajax({
 							type : "post",
-							url : "/checkAuthCode",
+							url : "/q/checkAuthCode",
 							data : {
 								'code' : $("#code").val()
 							},
@@ -83,7 +83,7 @@
 	}
 	function confirm() {
 		$.ajax({
-			url : "/queryNoCache?domain=" + $("#domain").val(),
+			url : "/q/queryNoCache?domain=" + $("#domain").val(),
 			type : "get",
 			dataType : "json",
 			success : function(json) {
@@ -107,7 +107,7 @@
 		});
 	}
 	function _confirm() {
-		$('#captcha').attr("src", "/genAuthCode?t=" + new Date().getTime());
+		$('#captcha').attr("src", "/q/genAuthCode?t=" + new Date().getTime());
 		$('#confirm-modal').show();
 		$("#code").focus();
 		$('.modal .close,.modal .no').bind(
@@ -115,13 +115,13 @@
 				function() {
 					$('.modal').hide();
 					$('.modal .captcha').attr("src",
-							"/genAuthCode?t=" + new Date().getTime());
+							"/q/genAuthCode?t=" + new Date().getTime());
 					$("#code").val('');
 					$(".modal-body p").html('请输入图片中的验证码').removeClass();
 					verifyCode = 0;
 				});
 		$('#captcha').bind('click', function() {
-			$(this).attr("src", "/genAuthCode?t=" + new Date().getTime());
+			$(this).attr("src", "/q/genAuthCode?t=" + new Date().getTime());
 		});
 	}
 
@@ -181,7 +181,7 @@
 			$('.cha-default').html('正在更新...');
 			$
 					.ajax({
-						url : "/queryWhithAuthCode",
+						url : "/q/queryWhithAuthCode",
 						type : "post",
 						data : {
 							'domain' : $("#domain").val(),
@@ -249,7 +249,7 @@
 		var obj = document.getElementById('domain'), domain = url2domain(obj.value);
 		if (domain) {
 			if (isDomain(domain)) {
-				referURL('/queryWitchCache?domain=' + domain);
+				referURL('/' + domain);
 			} else {
 				alert('域名格式错误！');
 				obj.focus();

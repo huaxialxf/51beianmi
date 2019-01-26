@@ -101,11 +101,7 @@ public class AiZhanICPService {
 	public String getAuthCode(byte[] image) throws Exception {
 		String code = null;
 		code = AuthCodeUtil.getCode(ImageIO.read(new ByteArrayInputStream(image)));
-		if (code != null) {
-			logger.debug("code == {}", code);
-		} else {
-			logger.debug("code == null");
-		}
+		logger.debug("code == {}", code);
 		return code;
 	}
 
@@ -147,9 +143,9 @@ public class AiZhanICPService {
 		param.put("switch", "1");
 		param.put("_csrf", token);
 
-		logger.info("checkAuthCode===============code:{} param:{} cookie:{}", code, param, cookie);
+		logger.debug("checkAuthCode===============code:{} param:{} cookie:{}", code, param, cookie);
 		String ret = clientKit.exePostMethodForString(url, headers, param);
-		logger.info("checkAuthCode===============" + ret);
+		logger.debug("checkAuthCode===============" + ret);
 		if (ret != null && ret.toLowerCase().indexOf("true") > -1) {
 			return true;
 		} else {
@@ -210,7 +206,7 @@ public class AiZhanICPService {
 		return bytes;
 	}
 
-	private BeianDomainInfo getAUnSriderDomain() {
+	public static BeianDomainInfo getAUnSriderDomain() {
 		List<BeianDomainInfo> list = BeianDomainInfo.dao
 				.find("select * from cha_icp_beian_domain_info where state_type = '01' limit 10");
 		if (list.size() > 0) {
@@ -318,18 +314,21 @@ public class AiZhanICPService {
 						}
 						continue;
 					}
-					if ("01".equals(saveInfo.getType())) {
-						List<BeianDomainInfo> list = AiZhanPageParser.parseDoc(saveInfo.getDomainName(),
-								saveInfo.getContent());
-						AiZhanPageParser.saveToDb(list);
-					} else if ("02".equals(saveInfo.getType())) {
-						List<BeianDomainInfo> list = AiZhanPageParser.parseJson(saveInfo.getDomainName(),
-								saveInfo.getContent());
-						AiZhanPageParser.saveToDb(list);
-					} else {
-						logger.error("error type:{}", saveInfo.getType());
+					try {
+						if ("01".equals(saveInfo.getType())) {
+							List<BeianDomainInfo> list = AiZhanPageParser.parseDoc(saveInfo.getDomainName(),
+									saveInfo.getContent());
+							AiZhanPageParser.saveToDb(list);
+						} else if ("02".equals(saveInfo.getType())) {
+							List<BeianDomainInfo> list = AiZhanPageParser.parseJson(saveInfo.getDomainName(),
+									saveInfo.getContent());
+							AiZhanPageParser.saveToDb(list);
+						} else {
+							logger.error("error type:{}", saveInfo.getType());
+						}
+					} catch (Exception e) {
+						logger.info(e.getMessage(), e);
 					}
-
 				}
 			};
 		};

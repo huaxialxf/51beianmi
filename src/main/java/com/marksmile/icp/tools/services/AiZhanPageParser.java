@@ -1,11 +1,16 @@
 package com.marksmile.icp.tools.services;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +20,7 @@ import com.jfinal.kit.StrKit;
 import com.marksmile.icp.tools.db.model.BeianDomainInfo;
 import com.marksmile.icp.tools.entry.AiZhanPageInfo;
 import com.marksmile.icp.tools.entry.IcpInfo;
+import com.marksmile.icp.tools.entry.IcpInfoMiitBeian;
 import com.marksmile.utils.DateUtil;
 import com.marksmile.utils.JSONUtil;
 
@@ -118,8 +124,7 @@ public class AiZhanPageParser {
 
 		List<IcpInfo> listCommpayDomain = aiZhanPageInfo.getListCommpayDomains();
 		for (IcpInfo icpInfo : listCommpayDomain) {
-			
-			
+
 			BeianDomainInfo beianDomainInfoList = new BeianDomainInfo();
 			beianDomainInfoList.setBeianNo(icpInfo.getBeiAnNo());
 			beianDomainInfoList.setBeianCompany(beianDomainInfo.getBeianCompany());
@@ -138,14 +143,67 @@ public class AiZhanPageParser {
 		return list;
 	}
 
+	public static List<BeianDomainInfo> parseMiit(String domainName, String html) {
+		List<BeianDomainInfo> list = new ArrayList<BeianDomainInfo>();
+		Document doc = Jsoup.parse(html);
+		Element tr = doc.select("table[width=100%]").select("tr").get(1);
+		if (tr == null) {
+			logger.error("parseMiit 内容不正确 : " + domainName);
+			return list;
+		}
+
+		BeianDomainInfo beianDomainInfo = new BeianDomainInfo();
+
+		if (tr.select("td").size() == 1 && tr.text().indexOf("没有符合条件的记录") > -1) {
+			logger.debug("未备案:domain={}", domainName);
+			beianDomainInfo.setDomainName(domainName);
+			beianDomainInfo.setStateType("03");// 01-未采集;02-采集中;03-采集完毕;04-采集失败
+			beianDomainInfo.setCreateTime(new Date());
+			beianDomainInfo.setSourceType("06");// 01-爱站历史;02-爱站List;03-爱站Single;04-爱站实时List;05-爱站实时;06-miit
+			beianDomainInfo.setBeianType("02");// 01-已备案;02-未备案
+			beianDomainInfo.setSpriderDate(new Date());
+			list.add(beianDomainInfo);
+		} else if ("1".equals(tr.attr("id"))) {
+			Elements tds = tr.select("td");
+
+			beianDomainInfo.setBeianNo(tds.get(3).text());
+			beianDomainInfo.setBeianCompany(tds.get(1).text());
+			beianDomainInfo.setBeianCompanyType(tds.get(2).text());
+			beianDomainInfo.setDomainName(domainName);
+			beianDomainInfo.setBeianTime(dateStringFormat(tds.get(6).text()));
+			beianDomainInfo.setBeianSiteName(tds.get(4).text());
+			beianDomainInfo.setBeianSiteUrl(tds.get(5).text());
+			beianDomainInfo.setStateType("03");// 01-未采集;02-采集中;03-采集完毕;04-采集失败
+			beianDomainInfo.setCreateTime(new Date());
+			beianDomainInfo.setSourceType("06");// 01-爱站历史;02-爱站List;03-爱站Single;04-爱站实时List;05-爱站实时;06-miit
+			beianDomainInfo.setBeianType("01");// 01-已备案;02-未备案
+			beianDomainInfo.setSpriderDate(new Date());
+			list.add(beianDomainInfo);
+
+		} else {
+			logger.error("parseMiit 内容不正确-2 " + domainName);
+		}
+
+		return list;
+	}
+
+	private static String dateStringFormat(String date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+		try {
+			return DateUtil.format(sdf.parse(date), DateUtil.YYYY_MM_DD);
+		} catch (ParseException e) {
+			logger.info("error date:{}", date);
+			return null;
+		}
+	}
+
 	public static void saveToDb(List<BeianDomainInfo> list) {
 		for (BeianDomainInfo beianDomainInfo : list) {
 			try {
 				if (StrKit.isBlank(beianDomainInfo.getDomainName())) {
-					logger.warn("domain == null");
+					logger.warn(" saveToDb domain == null");
 					continue;
 				}
-				
 
 				BeianDomainInfo d = beianDomainInfo.findFirst(
 						"select * from cha_icp_beian_domain_info where domain_name= ?",
@@ -164,7 +222,7 @@ public class AiZhanPageParser {
 						beianDomainInfo.getSourceType());
 				beianDomainInfo.save();
 			} catch (Exception e) {
-				logger.error(e.getMessage()+"|"+JSONUtil.toJsonString(beianDomainInfo), e);
+				logger.error(e.getMessage() + "|" + JSONUtil.toJsonString(beianDomainInfo), e);
 			}
 		}
 	}
