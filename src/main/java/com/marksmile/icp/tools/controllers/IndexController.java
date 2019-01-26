@@ -11,9 +11,9 @@ public class IndexController extends Controller {
 
 	public void index() throws Exception {
 		setAttr("info", new IcpInfo());
+		setAttr("isBeiAn", "true");
 		renderTemplate("/index.html");
 		return;
 	}
-
 
 }

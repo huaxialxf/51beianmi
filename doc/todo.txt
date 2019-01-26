@@ -3,4 +3,6 @@
 	2.正常的页面(58.com)-aizhang_02.html
 	3.未备案的域名-aizhang_03.html
 	4.少字段的页面-aizhang_04.html
-	
+2.ip的频率控制
+3.URL定制
+4.miitbeian.gov.cn 采集

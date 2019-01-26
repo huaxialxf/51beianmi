@@ -46,7 +46,7 @@
 					<i class="ico-bar-vertical"></i>
 					<h4>备案信息</h4>
 				</div>
-				<div id="icp-table" #if(!(info.domain || domain==null) ) style="display: none" #end >
+				<div id="icp-table" #if(!isBeiAn) style="display: none" #end >
 					<table class="table">
 						<tr>
 							<td class="thead">主办单位名称</td>
@@ -79,7 +79,7 @@
 						</tr>
 					</table>
 				</div>
-				<div id="icp-table-no"  #if(info.domain || domain==null ) style="display: none" #end >
+				<div id="icp-table-no"  #if(isBeiAn) style="display: none" #end >
 					<table class="table">
 						<tr>
 							<td class="thead">网站备案/许可证号</td>

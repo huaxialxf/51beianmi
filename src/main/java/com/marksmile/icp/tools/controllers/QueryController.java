@@ -27,6 +27,7 @@ public class QueryController extends Controller {
 		}
 		if (domain == null) {
 			setAttr("info", new IcpInfo());
+			setAttr("isBeiAn", true);
 			renderTemplate("/index.html");
 			return;
 		}
@@ -43,7 +44,11 @@ public class QueryController extends Controller {
 		} else {
 			logger.debug("02-queryWitchCache-domain:{}", domain);
 		}
-
+		if(info.isBeiAn()){
+			setAttr("isBeiAn", true);
+		}else{
+			setAttr("isBeiAn", false);
+		}
 		setAttr("info", info);
 		renderTemplate("/index.html");
 	}
@@ -64,6 +69,7 @@ public class QueryController extends Controller {
 			info.setShenHeTime(domainInfo.getBeianTime());
 			info.setSiteName(domainInfo.getBeianSiteName());
 			info.setSiteUrl(domainInfo.getBeianSiteUrl());
+			info.setBeiAn("01".equals(domainInfo.getBeianType()));
 			Date date = domainInfo.getSpriderDate();
 			if (date != null) {
 				info.setCacheTime(DateUtil.format(date, DateUtil.YYYY_MM_DD_HH_MM_SS));

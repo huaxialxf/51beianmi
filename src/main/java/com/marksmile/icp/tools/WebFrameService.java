@@ -41,8 +41,8 @@ public class WebFrameService {
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(dataSource);
 		_MappingKit.mapping(arp);
 		arp.start();
-		 AiZhanICPService.one().start();
-		MiitbeianService.one().start("miit");
+//		 AiZhanICPService.one().start();
+//		MiitbeianService.one().start("miit");
 		JFinal.main(new String[] { "webapp", String.valueOf(808), "/", "-1" });
 	}
 
